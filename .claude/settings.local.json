@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(python --version; python -c \"import sys; print\\(sys.executable\\)\")",
+      "PowerShell($arch = \\(Get-WmiObject Win32_Processor\\).Architecture; if \\($arch -eq 9\\) { \"x64\" } elseif \\($arch -eq 12\\) { \"arm64\" } else { \"x86 or other: $arch\" }; $osArch = \\(Get-WmiObject Win32_OperatingSystem\\).OSArchitecture; \"OS: $osArch\")",
+      "PowerShell(& \"C:\\\\Program Files\\\\Python312\\\\python.exe\" --version)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Python312\\\\python.exe\" -c \"import tkinter; print\\('tkinter OK'\\)\")",
+      "PowerShell(Get-Command *)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Git\\\\usr\\\\bin\\\\ssh.exe\" -T -o StrictHostKeyChecking=accept-new git@github.com 2>&1)",
+      "PowerShell(& \"C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe\" status)"
+    ]
+  }
+}
