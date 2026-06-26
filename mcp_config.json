@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "web-scraper-x402": {
-      "url": "http://localhost:8000/mcp/sse",
+      "url": "https://55d7a954bbefed.lhr.life/mcp/sse",
       "transport": "sse",
       "description": "Web scraper with x402 micropayments (0.1 USDC/call on Base)",
       "payment": {

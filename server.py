@@ -46,9 +46,9 @@ from x402 import PaymentRequired, PaymentRequirements, ResourceInfo
 
 # ---- x402 Payment Configuration ----
 RECIPIENT_ADDRESS: str = "0xcf15b97a41022427f50d4bb284c108eb0a716c2b"
-PRICE_USD: float = 0.10
+PRICE_USD: float = 0.001
 USDC_DECIMALS: int = 6
-USDC_AMOUNT: int = int(PRICE_USD * (10**USDC_DECIMALS))  # 100000 micro-USDC
+USDC_AMOUNT: int = int(PRICE_USD * (10**USDC_DECIMALS))  # 1000 micro-USDC (0.001 USD)
 CHAIN_ID: int = 8453  # Base Mainnet
 TOKEN_SYMBOL: str = "USDC"
 USDC_BASE_ADDRESS: str = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"

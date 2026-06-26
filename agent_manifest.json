@@ -21,14 +21,12 @@
     "icon_url": "",
     "repository": "https://github.com/dji112062126-cyber/first-cc"
   },
-
   "protocol": {
     "type": "mcp",
     "transport": "sse",
-    "endpoint": "<YOUR_PUBLIC_TUNNEL_URL>/mcp/sse",
-    "endpoint_note": "Replace <YOUR_PUBLIC_TUNNEL_URL> with your ngrok/cpolar HTTPS URL. Example: https://abc123.ngrok-free.app/mcp/sse"
+    "endpoint": "https://55d7a954bbefed.lhr.life/mcp/sse",
+    "endpoint_note": "Auto-detected tunnel URL: https://55d7a954bbefed.lhr.life/mcp/sse"
   },
-
   "pricing": {
     "model": "per-call",
     "currency": "USDC",
@@ -44,7 +42,6 @@
     "payment_header": "X-402-Payment",
     "payment_header_description": "Include the Base chain USDC transfer transaction hash as the value of this HTTP header."
   },
-
   "blockchain": {
     "network": "base",
     "chain_id": 8453,
@@ -55,7 +52,6 @@
     "amount_unit": "micro-USDC",
     "amount_note": "1000 micro-USDC = 0.001 USDC"
   },
-
   "tools": [
     {
       "name": "get_service_info",
@@ -83,13 +79,11 @@
       }
     }
   ],
-
   "verification": {
     "method": "on-chain-event-log",
     "description": "Server verifies USDC Transfer events on Base mainnet. The transaction receipt is fetched via eth_getTransactionReceipt and logs are scanned for a Transfer to the recipient address with amount >= required.",
     "rpc_fallback": "Public Base RPC endpoints are tried in order. Set BASE_RPC_URL environment variable for a dedicated endpoint."
   },
-
   "requirements": {
     "python": ">=3.12",
     "dependencies": [
@@ -100,7 +94,13 @@
       "httpx",
       "beautifulsoup4"
     ],
-    "platforms": ["windows", "macos", "linux"],
-    "ports": [8000]
+    "platforms": [
+      "windows",
+      "macos",
+      "linux"
+    ],
+    "ports": [
+      8000
+    ]
   }
 }
