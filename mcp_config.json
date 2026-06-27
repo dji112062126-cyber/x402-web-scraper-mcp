@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "web-scraper-x402": {
-      "url": "https://8f372f1b5b3ec361-27-46-89-4.serveousercontent.com/mcp/sse",
+      "url": "https://ab3492f5d680c97e-27-38-194-235.serveousercontent.com/mcp/sse",
       "transport": "sse",
       "description": "Web scraper with x402 micropayments (0.1 USDC/call on Base)",
       "payment": {

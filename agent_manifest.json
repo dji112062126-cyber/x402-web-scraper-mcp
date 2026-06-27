@@ -24,8 +24,8 @@
   "protocol": {
     "type": "mcp",
     "transport": "sse",
-    "endpoint": "https://8f372f1b5b3ec361-27-46-89-4.serveousercontent.com/mcp/sse",
-    "endpoint_note": "Live tunnel URL: https://console.serveo.net/mcp/sse"
+    "endpoint": "https://ab3492f5d680c97e-27-38-194-235.serveousercontent.com/mcp/sse",
+    "endpoint_note": "Live tunnel: https://ab3492f5d680c97e-27-38-194-235.serveousercontent.com/mcp/sse"
   },
   "pricing": {
     "model": "per-call",

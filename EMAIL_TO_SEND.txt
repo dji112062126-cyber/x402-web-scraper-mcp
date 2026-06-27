@@ -1,0 +1,33 @@
+============================================
+ X402 Web Scraper MCP - Deployment Complete
+============================================
+Generated: 2026-06-27 00:51:38
+
+=== LIVE SERVICE (VERIFIED) ===
+Health:  https://8f372f1b5b3ec361-27-46-89-4.serveousercontent.com/health
+MCP SSE: https://8f372f1b5b3ec361-27-46-89-4.serveousercontent.com/mcp/sse
+Payment: https://8f372f1b5b3ec361-27-46-89-4.serveousercontent.com/payment-info
+
+=== CODE ===
+GitHub: https://github.com/dji112062126-cyber/first-cc
+
+=== PRICING ===
+0.001 USDC per call on Base (chain 8453)
+USDC Contract: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+Recipient: 0xcf15b97a41022427f50d4bb284c108eb0a716c2b
+
+=== MARKETPLACE ===
+Coinbase: agent_manifest.json READY for submission
+Smithery: Needs API key from https://smithery.ai/account/api-keys
+  Publish cmd: smithery mcp publish <URL> -n dji112062126/web-scraper-x402
+
+=== VERIFY ===
+curl https://8f372f1b5b3ec361-27-46-89-4.serveousercontent.com/health
+Response: {"status":"ok"}
+
+=== FILES ===
+server.py, test_client.py, deploy.py, publish_all.py
+agent_manifest.json, coinbase_submission.json
+mcp_config.json, README.md
+
+--- Deployed by Claude Code AI ---
