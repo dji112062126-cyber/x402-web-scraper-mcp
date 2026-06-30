@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent 学习宝典 — 从入门到精通</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;600;700;900&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --card-bg: #13131a;
+    --surface: #1a1a25;
+    --border: #252535;
+    --text: #e4e4ec;
+    --text-secondary: #9090a8;
+    --accent-1: #7c3aed;
+    --accent-2: #06b6d4;
+    --accent-3: #f59e0b;
+    --accent-4: #10b981;
+    --accent-5: #ef4444;
+    --accent-6: #8b5cf6;
+    --accent-7: #ec4899;
+    --accent-8: #3b82f6;
+    --accent-9: #14b8a6;
+    --accent-10: #f97316;
+    --glow-1: rgba(124,58,237,0.15);
+    --glow-2: rgba(6,182,212,0.12);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; font-size:16px; }
+  body {
+    font-family:'Inter','Noto Sans SC',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    overflow-x:hidden;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Ambient background */
+  .bg-grid {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(124,58,237,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.03) 1px, transparent 1px);
+    background-size:60px 60px;
+  }
+  .bg-glow-1 {
+    position:fixed; top:-20%; left:-10%; width:700px; height:700px;
+    background:radial-gradient(circle, var(--glow-1), transparent 70%);
+    z-index:0; pointer-events:none; border-radius:50%;
+  }
+  .bg-glow-2 {
+    position:fixed; bottom:-20%; right:-10%; width:600px; height:600px;
+    background:radial-gradient(circle, var(--glow-2), transparent 70%);
+    z-index:0; pointer-events:none; border-radius:50%;
+  }
+
+  /* Header */
+  .header {
+    position:relative; z-index:2; text-align:center; padding:80px 20px 40px;
+    max-width:1000px; margin:0 auto;
+  }
+  .header .badge {
+    display:inline-block; padding:6px 16px; border-radius:99px;
+    background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.3);
+    color:#a78bfa; font-size:0.8rem; font-weight:600; letter-spacing:0.08em;
+    text-transform:uppercase; margin-bottom:24px;
+  }
+  .header h1 {
+    font-size:clamp(2.2rem, 5vw, 3.6rem); font-weight:900;
+    background:linear-gradient(135deg, #c4b5fd, #67e8f9, #fde68a);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text; margin-bottom:16px; letter-spacing:-0.02em;
+  }
+  .header .subtitle {
+    font-size:1.1rem; color:var(--text-secondary); max-width:600px; margin:0 auto;
+    font-weight:400; line-height:1.7;
+  }
+  .header .stats {
+    display:flex; gap:32px; justify-content:center; margin-top:32px; flex-wrap:wrap;
+  }
+  .header .stat {
+    text-align:center;
+  }
+  .header .stat-num {
+    font-size:2rem; font-weight:800; color:#c4b5fd;
+  }
+  .header .stat-label {
+    font-size:0.8rem; color:var(--text-secondary); margin-top:2px;
+  }
+
+  /* Main grid */
+  .main {
+    position:relative; z-index:2; max-width:1300px; margin:0 auto;
+    padding:0 20px 80px;
+  }
+
+  .categories-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));
+    gap:18px;
+  }
+
+  /* Category cards */
+  .cat-card {
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:28px 24px;
+    cursor:pointer;
+    transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+    position:relative;
+    overflow:hidden;
+  }
+  .cat-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:var(--card-accent, var(--accent-1));
+    opacity:0; transition:opacity 0.3s;
+  }
+  .cat-card:hover {
+    transform:translateY(-4px);
+    border-color:var(--card-accent, var(--accent-1));
+    box-shadow:0 12px 40px rgba(0,0,0,0.4), 0 0 60px var(--card-glow, var(--glow-1));
+  }
+  .cat-card:hover::before { opacity:1; }
+  .cat-card .icon {
+    font-size:2.2rem; margin-bottom:14px; display:block;
+  }
+  .cat-card h3 {
+    font-size:1.15rem; font-weight:700; margin-bottom:8px; color:#fff;
+  }
+  .cat-card p {
+    font-size:0.85rem; color:var(--text-secondary); line-height:1.5;
+  }
+  .cat-card .count {
+    display:inline-block; margin-top:12px; font-size:0.75rem;
+    color:var(--card-accent, var(--accent-1)); font-weight:600;
+  }
+
+  /* Accent colors per card */
+  .cat-card:nth-child(1) { --card-accent:var(--accent-1); --card-glow:var(--glow-1); }
+  .cat-card:nth-child(2) { --card-accent:var(--accent-2); --card-glow:rgba(6,182,212,0.1); }
+  .cat-card:nth-child(3) { --card-accent:var(--accent-3); --card-glow:rgba(245,158,11,0.1); }
+  .cat-card:nth-child(4) { --card-accent:var(--accent-4); --card-glow:rgba(16,185,129,0.1); }
+  .cat-card:nth-child(5) { --card-accent:var(--accent-5); --card-glow:rgba(239,68,68,0.1); }
+  .cat-card:nth-child(6) { --card-accent:var(--accent-6); --card-glow:rgba(139,92,246,0.1); }
+  .cat-card:nth-child(7) { --card-accent:var(--accent-7); --card-glow:rgba(236,72,153,0.1); }
+  .cat-card:nth-child(8) { --card-accent:var(--accent-8); --card-glow:rgba(59,130,246,0.1); }
+  .cat-card:nth-child(9) { --card-accent:var(--accent-9); --card-glow:rgba(20,184,166,0.1); }
+  .cat-card:nth-child(10){ --card-accent:var(--accent-10); --card-glow:rgba(249,115,22,0.1); }
+
+  /* Modal overlay */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.75);
+    backdrop-filter:blur(6px); z-index:999; display:none;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.active { display:flex; }
+
+  /* Modal */
+  .modal {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:20px; width:100%; max-width:900px; max-height:85vh;
+    display:flex; flex-direction:column; overflow:hidden;
+    animation:modalIn 0.3s cubic-bezier(0.4,0,0.2,1);
+    box-shadow:0 30px 80px rgba(0,0,0,0.6);
+  }
+  @keyframes modalIn {
+    from { opacity:0; transform:scale(0.95) translateY(20px); }
+    to { opacity:1; transform:scale(1) translateY(0); }
+  }
+  .modal-header {
+    padding:24px 28px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:12px; flex-shrink:0;
+  }
+  .modal-header .m-icon { font-size:2rem; }
+  .modal-header h2 {
+    font-size:1.4rem; font-weight:700; flex:1;
+  }
+  .modal-close {
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--border);
+    background:transparent; color:var(--text); cursor:pointer;
+    font-size:1.2rem; display:flex; align-items:center; justify-content:center;
+    transition:all 0.2s;
+  }
+  .modal-close:hover { background:rgba(255,255,255,0.05); border-color:#555; }
+  .modal-body {
+    padding:24px 28px; overflow-y:auto; flex:1;
+    scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+  }
+  .modal-body::-webkit-scrollbar { width:6px; }
+  .modal-body::-webkit-scrollbar-track { background:transparent; }
+  .modal-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+
+  /* Content blocks */
+  .content-section { margin-bottom:28px; }
+  .content-section:last-child { margin-bottom:0; }
+  .content-section h3 {
+    font-size:1rem; font-weight:700; color:#c4b5fd;
+    margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border);
+  }
+  .resource-list { display:flex; flex-direction:column; gap:10px; }
+  .resource-item {
+    background:var(--card-bg); border:1px solid var(--border); border-radius:12px;
+    padding:14px 18px; transition:all 0.2s;
+  }
+  .resource-item:hover {
+    border-color:#555; background:rgba(255,255,255,0.02);
+  }
+  .resource-item .ri-title {
+    font-weight:600; font-size:0.95rem; margin-bottom:4px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .resource-item .ri-title a {
+    color:var(--text); text-decoration:none; transition:color 0.2s;
+  }
+  .resource-item .ri-title a:hover { color:var(--accent-2); }
+  .resource-item .ri-desc {
+    font-size:0.82rem; color:var(--text-secondary); line-height:1.5;
+  }
+  .resource-item .ri-tags {
+    display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;
+  }
+  .tag {
+    font-size:0.7rem; padding:2px 10px; border-radius:99px;
+    background:rgba(124,58,237,0.12); color:#a78bfa;
+    font-weight:500; white-space:nowrap;
+  }
+  .tag.green { background:rgba(16,185,129,0.12); color:#6ee7b7; }
+  .tag.blue { background:rgba(59,130,246,0.12); color:#93c5fd; }
+  .tag.amber { background:rgba(245,158,11,0.12); color:#fcd34d; }
+  .tag.red { background:rgba(239,68,68,0.12); color:#fca5a5; }
+  .tag.pink { background:rgba(236,72,153,0.12); color:#f9a8d4; }
+
+  .comparison-table {
+    width:100%; border-collapse:collapse; font-size:0.82rem; margin-top:8px;
+  }
+  .comparison-table th {
+    text-align:left; padding:10px 12px; background:rgba(124,58,237,0.1);
+    color:#c4b5fd; font-weight:600; border-radius:4px 4px 0 0;
+  }
+  .comparison-table td {
+    padding:10px 12px; border-bottom:1px solid var(--border);
+    color:var(--text-secondary);
+  }
+  .comparison-table tr:hover td { background:rgba(255,255,255,0.01); }
+
+  .highlight-box {
+    background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.2);
+    border-radius:12px; padding:16px 20px; margin-top:12px;
+  }
+  .highlight-box p { font-size:0.85rem; color:var(--text-secondary); margin-bottom:4px; }
+  .highlight-box p:last-child { margin-bottom:0; }
+  .highlight-box strong { color:#c4b5fd; }
+
+  .link-btn {
+    display:inline-block; padding:6px 16px; border-radius:8px;
+    background:rgba(124,58,237,0.15); color:#c4b5fd;
+    text-decoration:none; font-size:0.8rem; font-weight:600;
+    transition:all 0.2s; border:1px solid transparent;
+  }
+  .link-btn:hover { background:rgba(124,58,237,0.25); border-color:rgba(124,58,237,0.4); }
+
+  /* Footer */
+  .footer {
+    position:relative; z-index:2; text-align:center; padding:40px 20px;
+    color:var(--text-secondary); font-size:0.8rem;
+    border-top:1px solid var(--border);
+  }
+  .footer a { color:#a78bfa; text-decoration:none; }
+
+  @media (max-width:640px) {
+    .categories-grid { grid-template-columns:1fr; }
+    .header { padding:40px 16px 24px; }
+    .modal { max-height:92vh; border-radius:16px; }
+    .modal-body { padding:16px; }
+    .comparison-table { font-size:0.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+
+<!-- Header -->
+<header class="header">
+  <div class="badge">✦ 2026 全网精华汇编</div>
+  <h1>AI Agent 学习宝典</h1>
+  <p class="subtitle">从零基础到工程实战，涵盖框架、MCP协议、架构设计、安全治理、评估监控、记忆系统、必读论文等全方位 Agent 知识体系</p>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">10+</div><div class="stat-label">分类领域</div></div>
+    <div class="stat"><div class="stat-num">200+</div><div class="stat-label">精选资源</div></div>
+    <div class="stat"><div class="stat-num">50+</div><div class="stat-label">顶级论文</div></div>
+    <div class="stat"><div class="stat-num">15+</div><div class="stat-label">框架对比</div></div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main">
+<div class="categories-grid">
+
+  <!-- Cat 1: 入门必学 -->
+  <div class="cat-card" onclick="openModal('getting-started')">
+    <span class="icon">🎯</span>
+    <h3>入门必学</h3>
+    <p>从零基础到 Agent 开发者的完整学习路线，精选免费与付费课程</p>
+    <span class="count">12+ 课程 · 4 学习路径</span>
+  </div>
+
+  <!-- Cat 2: 框架与工具 -->
+  <div class="cat-card" onclick="openModal('frameworks')">
+    <span class="icon">🏗️</span>
+    <h3>框架与工具</h3>
+    <p>LangChain · CrewAI · AutoGen · OpenAI Agents · Google ADK 深度对比</p>
+    <span class="count">15+ 框架 · 选型矩阵</span>
+  </div>
+
+  <!-- Cat 3: MCP协议 -->
+  <div class="cat-card" onclick="openModal('mcp')">
+    <span class="icon">🔌</span>
+    <h3>MCP 协议</h3>
+    <p>Model Context Protocol 完整学习指南，从入门到生产部署</p>
+    <span class="count">8+ 教程 · SDK 指南</span>
+  </div>
+
+  <!-- Cat 4: 提示词与推理 -->
+  <div class="cat-card" onclick="openModal('prompting')">
+    <span class="icon">🧠</span>
+    <h3>提示词与推理</h3>
+    <p>CoT · ReAct · Plan-and-Execute · Reflexion 等核心Agent推理模式</p>
+    <span class="count">9+ 模式 · 深度解析</span>
+  </div>
+
+  <!-- Cat 5: 架构设计 -->
+  <div class="cat-card" onclick="openModal('architecture')">
+    <span class="icon">🏛️</span>
+    <h3>架构设计</h3>
+    <p>单Agent · 多Agent · 层次化 · 路由分发等生产级架构模式</p>
+    <span class="count">6+ 架构 · 设计模式</span>
+  </div>
+
+  <!-- Cat 6: 安全与治理 -->
+  <div class="cat-card" onclick="openModal('security')">
+    <span class="icon">🛡️</span>
+    <h3>安全与治理</h3>
+    <p>Guardrails · 权限控制 · OWASP Top 10 · 合规审计 · 红队测试</p>
+    <span class="count">7 层防护 · 法规解读</span>
+  </div>
+
+  <!-- Cat 7: 评估与监控 -->
+  <div class="cat-card" onclick="openModal('evaluation')">
+    <span class="icon">📊</span>
+    <h3>评估与监控</h3>
+    <p>Benchmark · 轨迹评估 · 生产可观测性 · Chaos测试 · CI/CD集成</p>
+    <span class="count">8+ 工具 · 3层体系</span>
+  </div>
+
+  <!-- Cat 8: 记忆与知识 -->
+  <div class="cat-card" onclick="openModal('memory')">
+    <span class="icon">💾</span>
+    <h3>记忆与知识</h3>
+    <p>RAG · 知识图谱 · 长期记忆 · 层次化记忆 · 自进化图记忆引擎</p>
+    <span class="count">8+ 系统 · 前沿论文</span>
+  </div>
+
+  <!-- Cat 9: 必读论文 -->
+  <div class="cat-card" onclick="openModal('papers')">
+    <span class="icon">📚</span>
+    <h3>必读论文</h3>
+    <p>2024–2026 年 Agent 领域最具影响力的学术论文精选</p>
+    <span class="count">20+ 论文 · 系统综述</span>
+  </div>
+
+  <!-- Cat 10: 实战项目 -->
+  <div class="cat-card" onclick="openModal('projects')">
+    <span class="icon">🔧</span>
+    <h3>实战项目</h3>
+    <p>从零构建 Agent 的hands-on项目，涵盖 Coding / 客服 / RAG / 多Agent</p>
+    <span class="count">10+ 项目 · 源码开放</span>
+  </div>
+
+</div>
+</main>
+
+<footer class="footer">
+  <p>Built with ❤️ · Data sourced from GitHub, arXiv, official docs, and community curations · June 2026</p>
+  <p><a href="https://github.com/dji112062126-cyber/first-cc" target="_blank">View Source</a></p>
+</footer>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+<div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-header">
+    <span class="m-icon" id="modalIcon"></span>
+    <h2 id="modalTitle"></h2>
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+  </div>
+  <div class="modal-body" id="modalBody"></div>
+</div>
+</div>
+
+<script>
+const DATA = {
+
+'getting-started': `
+<div class="content-section">
+  <h3>📖 推荐学习路径</h3>
+  <div class="highlight-box">
+    <p><strong>路径A — CLI 工具使用者</strong>（8-10周）：LLM基础 → Prompt Engineering → MCP工具使用 → Agent编排</p>
+    <p><strong>路径B — Agent 构建者</strong>（16-22周）：Python/TS基础 → API调用 → 单Agent → 多Agent系统 → 生产部署</p>
+    <p><strong>路径C — 快速入门</strong>（1-2周）：Scrimba Learn AI Agents (117min) → Hugging Face AI Agents Course → 实战项目</p>
+    <p><strong>路径D — 学术研究者</strong>：论文精读 → 框架源码分析 → 复现实验 → 发表paper</p>
+  </div>
+</div>
+<div class="content-section">
+  <h3>🎓 免费课程（强烈推荐）</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.deeplearning.ai/courses/agentic-ai/" target="_blank">Agentic AI (Andrew Ng)</a> <span class="tag green">免费</span></div>
+      <div class="ri-desc">DeepLearning.AI 出品，Andrew Ng 亲授。覆盖 Agent 核心概念：工具使用、规划、多Agent协作。5模块，可免费旁听。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://huggingface.co/learn/agents-course" target="_blank">AI Agents Course (Hugging Face)</a> <span class="tag green">免费</span> <span class="tag blue">证书</span></div>
+      <div class="ri-desc">开源免费 + 官方证书。4单元+bonus，涵盖 Agent 基础、框架、工具使用、生产部署。社区活跃度极高。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/microsoft/ai-agents-for-beginners" target="_blank">AI Agents for Beginners (Microsoft)</a> <span class="tag green">免费</span> <span class="tag">MIT</span></div>
+      <div class="ri-desc">15课完整入门课程，从Agent概念到多Agent系统。含Python代码示例，自定进度，MIT开源。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://scrimba.com/articles/best-courses-to-learn-ai-agents-and-agentic-ai-in-2026/" target="_blank">Learn AI Agents (Scrimba)</a> <span class="tag amber">部分免费</span></div>
+      <div class="ri-desc">交互式编码课程，最适合JS开发者。117分钟快速上手，Pro版($24.50/月)解锁全部内容。</div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>💎 付费深度课程</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.udemy.com/course/complete-agent-mcp-course/" target="_blank">Complete Agent & MCP Course (Ed Donner)</a> <span class="tag amber">Udemy</span></div>
+      <div class="ri-desc">17小时/8个项目/5个框架全覆盖。从零构建Agent到MCP Server，社区评价极高。经常打折至$15-25。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.coursera.org/specializations/ai-agent-developer" target="_blank">AI Agent Developer Specialization (Vanderbilt)</a> <span class="tag amber">Coursera</span></div>
+      <div class="ri-desc">大学认证专项课，~64小时。Jules White教授主讲，系统深入，适合追求学术深度的开发者。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.datacamp.com/zh/courses/introduction-to-model-context-protocol-mcp" target="_blank">Introduction to MCP (DataCamp)</a> <span class="tag amber">DataCamp</span></div>
+      <div class="ri-desc">3小时互动式 MCP 课程，11视频+练习。Python方向，含完成证书。</div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>📂 综合学习仓库</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/WenyuChiou/awesome-agentic-ai-zh" target="_blank">awesome-agentic-ai-zh</a> <span class="tag green">三语</span></div>
+      <div class="ri-desc">繁中/English/简中三语学习路线图，240+精选资源，8阶段从LLM基础到多Agent系统。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/jjyaoao/Agent-Learning-Hub" target="_blank">Agent-Learning-Hub</a> <span class="tag">中文</span></div>
+      <div class="ri-desc">结构化TODO清单，从"构建最小Agent循环"到"交付真实Agent"。含11级项目阶梯。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/keyuchen21/agentic-engineering-handbook" target="_blank">Agentic Engineering Handbook</a> <span class="tag blue">英文</span></div>
+      <div class="ri-desc">160精选资源，6个阶段：OpenAI、Claude、MCP、Harness工程、Evals、生产系统。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/caramaschiHG/awesome-ai-agents-2026" target="_blank">awesome-ai-agents-2026</a> <span class="tag green">2026最新</span></div>
+      <div class="ri-desc">340+工具/框架，20+分类。每月更新，目前最全面的Agent工具目录。</div>
+    </div>
+  </div>
+</div>
+`,
+
+'frameworks': `
+<div class="content-section">
+  <h3>⚡ 核心框架对比矩阵</h3>
+  <table class="comparison-table">
+    <tr><th>框架</th><th>架构</th><th>最适合</th><th>Stars(2026)</th><th>每次任务成本</th></tr>
+    <tr><td>LangChain / LangGraph</td><td>图状态机（节点+边）</td><td>复杂、可审计的工作流</td><td>~31.4k</td><td>~$0.08</td></tr>
+    <tr><td>CrewAI</td><td>角色化团队（Role-Based）</td><td>内容管线、快速原型</td><td>~50.8k</td><td>~$0.24</td></tr>
+    <tr><td>AutoGen / AG2</td><td>对话式多Agent循环</td><td>开放式推理、协作辩论</td><td>~57.8k</td><td>~$0.40-0.48</td></tr>
+    <tr><td>OpenAI Agents SDK</td><td>轻量Agent+Guardrails</td><td>OpenAI生态快速集成</td><td>新项目</td><td>中等</td></tr>
+    <tr><td>Google ADK</td><td>Google云深度集成</td><td>Google Stack用户</td><td>新项目</td><td>中等</td></tr>
+    <tr><td>Anthropic Claude Agent SDK</td><td>声明式Agent+Skills+MCP</td><td>Claude生态深度集成</td><td>新项目</td><td>中等</td></tr>
+    <tr><td>Pydantic AI</td><td>类型安全Agent框架</td><td>Python类型安全优先</td><td>快速增长</td><td>低</td></tr>
+  </table>
+</div>
+<div class="content-section">
+  <h3>📖 框架深度解析</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.langchain.com/langgraph" target="_blank">LangGraph</a> <span class="tag">推荐</span></div>
+      <div class="ri-desc"><strong>优势：</strong>显式控制流、时光旅行调试、检查点、最低Token消耗、持久执行、人机协作。<br/><strong>劣势：</strong>学习曲线陡峭，StateGraph心智模型需要前期设计投入。<br/><strong>选型建议：</strong>有明确定义工作流、需要合规和审计追踪的场景首选。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.crewai.com/" target="_blank">CrewAI</a> <span class="tag">最易上手</span></div>
+      <div class="ri-desc"><strong>优势：</strong>最快原型速度（~20行代码），直观的角色/任务抽象，5.2亿+月下载量，已独立于LangChain。<br/><strong>劣势：</strong>管理层开销导致3倍Token膨胀；Python专用；细粒度控制有限。<br/><strong>选型建议：</strong>原型速度优先、基于角色的内容/研究管线匹配的场景。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://ag2.ai/" target="_blank">AG2 (AutoGen 社区分支)</a> <span class="tag red">注意</span></div>
+      <div class="ri-desc"><strong>⚠️ AutoGen原版已进入维护模式，AG2是活跃的社区分支。微软官方替代品是Microsoft Agent Framework (MAF)。</strong><br/><strong>优势：</strong>擅长协作推理、代码生成与自我修正、涌现式Agent行为。<br/><strong>劣势：</strong>单任务Token成本最高；API变动频繁曾困扰生产团队。<br/><strong>建议：</strong>不要在旧版AutoGen上启动新项目。</div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>🔗 更多框架资源</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://futureagi.com/blog/best-multi-agent-frameworks-2026/" target="_blank">Best Multi-Agent Frameworks 2026</a></div>
+      <div class="ri-desc">7大平台生产级排名与详细评测，含成本对比和适用场景分析。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://cloud.baidu.com/article/5319282" target="_blank">2026年Agentic AI框架选型指南（中文）</a></div>
+      <div class="ri-desc">20大框架深度解析与对比，百度云出品，中文友好。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.signadot.com/blog/the-best-ai-agent-frameworks-for-2026/" target="_blank">The Best AI Agent Frameworks for 2026</a></div>
+      <div class="ri-desc">涵盖新兴框架和生产环境评估指标。</div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>💡 新兴趋势：难度感知路由</h3>
+  <div class="highlight-box">
+    <p>研究表明，添加轻量级分类器将简单任务路由到单Agent流（跳过完整多Agent编排），可以<strong>降低30-50%成本</strong>——无论选择哪个框架，这都是框架选择之外最具影响力的优化手段。</p>
+  </div>
+</div>
+`,
+
+'mcp': `
+<div class="content-section">
+  <h3>🔌 什么是 MCP？</h3>
+  <div class="highlight-box">
+    <p>MCP（Model Context Protocol）是 Anthropic 于2024年11月推出的<strong>开放标准</strong>，让AI应用通过统一接口连接外部工具、数据源和服务。2025年12月捐赠给 Linux Foundation 旗下的 Agentic AI Foundation，与 Block、OpenAI 联合创立，Google、Microsoft、AWS、Cloudflare、Bloomberg 等背书。</p>
+    <p>截至2026年3月：<strong>9700万+月SDK下载量</strong>，<strong>10,000+活跃公共Server</strong>。</p>
+  </div>
+</div>
+<div class="content-section">
+  <h3>🏗️ 三大原语</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title">🛠️ Tools（工具）</div>
+      <div class="ri-desc">模型可调用的<strong>操作</strong>：发送邮件、查询数据库、运行计算、调用API。</div>
+      <div class="ri-tags"><span class="tag">Action</span><span class="tag green">POST/PUT/DELETE</span></div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">📖 Resources（资源）</div>
+      <div class="ri-desc">模型可获取的<strong>只读数据</strong>：文件内容、API响应、文档、数据库查询结果。</div>
+      <div class="ri-tags"><span class="tag blue">Read-Only</span><span class="tag">GET</span></div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">💬 Prompts（提示模板）</div>
+      <div class="ri-desc">可复用的<strong>指令模板</strong>，塑造模型行为。标准化常用交互模式。</div>
+      <div class="ri-tags"><span class="tag amber">Template</span><span class="tag pink">Reusable</span></div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>🎓 学习资源</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://modelcontextprotocol.io/" target="_blank">MCP 官方规范</a> <span class="tag green">必读</span></div>
+      <div class="ri-desc">约1小时通读架构，是所有MCP开发的起点。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://huggingface.co/learn/agents-course" target="_blank">Hugging Face MCP Course</a> <span class="tag green">免费证书</span></div>
+      <div class="ri-desc">4单元，Python & TypeScript双语言，含免费官方证书。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/microsoft/MCP-for-beginners" target="_blank">Microsoft: MCP for Beginners</a> <span class="tag green">MIT</span></div>
+      <div class="ri-desc">11模块/50+课程，覆盖C#/Java/JS/Python/TS/Rust六种语言。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.deeplearning.ai/short-courses/mcp-build-rich-context-ai-apps/" target="_blank">DeepLearning.AI: MCP Build Rich-Context AI Apps</a></div>
+      <div class="ri-desc">1h48min，11课。快速上手MCP应用开发。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://render.com/articles/building-and-hosting-mcp-servers-a-complete-guide" target="_blank">Render: Building & Hosting MCP Servers</a></div>
+      <div class="ri-desc">从构建到部署的完整实战指南，含Python & Node.js示例。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.cosmicjs.com/blog/mcp-server-complete-guide" target="_blank">MCP Server: The Complete Guide for Developers</a></div>
+      <div class="ri-desc">2026最新完整开发者指南，覆盖生产部署最佳实践。</div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>✅ MCP 最佳实践（来自Anthropic官方）</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title">按意图而非端点分组工具</div>
+      <div class="ri-desc">❌ get_thread + parse_messages + create_issue + link_attachment → ✅ create_issue_from_thread（单个工具）</div>
+      <div class="ri-tags"><span class="tag green">Design</span></div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">启用 Tool Search（减少85% Token）</div>
+      <div class="ri-desc">工具搜索延迟加载工具定义，Anthropic测试显示减少85%+工具定义Token，同时保持高选择准确率。</div>
+      <div class="ri-tags"><span class="tag blue">Performance</span></div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">每个Agent最多10个工具</div>
+      <div class="ri-desc">每个工具增加~200-500 tokens到上下文，增加攻击面，减慢决策。定期审计工具列表。</div>
+      <div class="ri-tags"><span class="tag red">Security</span><span class="tag">Limit</span></div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">代码编排处理大工具面</div>
+      <div class="ri-desc">对有数百个操作的服务（Cloudflare/AWS/K8s），暴露薄工具层接受代码。Cloudflare的MCP Server用2个工具覆盖~2500个端点。</div>
+      <div class="ri-tags"><span class="tag amber">Advanced</span></div>
+    </div>
+  </div>
+</div>
+`,
+
+'prompting': `
+<div class="content-section">
+  <h3>🧠 Agent 推理模式全景</h3>
+  <table class="comparison-table">
+    <tr><th>模式</th><th>描述</th><th>Token成本</th><th>最适合</th></tr>
+    <tr><td><strong>CoT</strong> (Chain of Thought)</td><td>单路径线性推理，"Let's think step by step"</td><td>低</td><td>简单分析、分类</td></tr>
+    <tr><td><strong>ReAct</strong> (Reasoning + Acting)</td><td>Thought→Action→Observation 循环，工具调用与推理交替</td><td>中-高</td><td>78%生产Agent在用</td></tr>
+    <tr><td><strong>Plan-and-Execute</strong></td><td>先规划完整计划，再逐步执行，失败时重规划</td><td>中</td><td>可预测的多步工作流</td></tr>
+    <tr><td><strong>Reflexion</strong></td><td>ReAct + 自我批判循环：评估→识别差距→修正计划</td><td>很高</td><td>高质量关键输出</td></tr>
+    <tr><td><strong>Tree-of-Thoughts</strong></td><td>分支-剪枝推理，同时探索多条路径，回溯死胡同</td><td>很高</td><td>困难推理问题</td></tr>
+    <tr><td><strong>CodeAct</strong></td><td>规划器输出可执行代码替代NL步骤，变量+异常管理状态</td><td>中</td><td>长周期可靠性任务</td></tr>
+    <tr><td><strong>ReWOO</strong></td><td>提前规划所有工具调用，然后执行，无需每步推理</td><td>中</td><td>可并行的安全工作流</td></tr>
+  </table>
+</div>
+<div class="content-section">
+  <h3>🔑 核心洞察</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title">⚠️ "肮脏秘密"：90%的Agent"规划"只是CoT+while循环</div>
+      <div class="ri-desc">真正的规划需要：①可评估子目标的<strong>任务分解</strong>；②<strong>显式状态管理</strong>（非仅上下文记忆）；③<strong>环境反馈修正</strong>每个假设；④失败时<strong>动态重规划</strong>（回溯、改道、放弃子目标）。AutoGPT/BabyAGI及大多数ReAct Demo都在这些维度上不及格。</div>
+      <div class="ri-tags"><span class="tag red">关键认知</span></div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">🧩 2026趋势：从"提示工程"到"流程工程"</div>
+      <div class="ri-desc">设计控制流、状态转换和决策边界——而非优化单个prompt。"上下文工程"成为新学科——管理模型在每个执行点拥有的信息以对抗"上下文腐烂"（context rot：窗口越大，召回越差）。</div>
+      <div class="ri-tags"><span class="tag blue">趋势</span></div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">🎯 生产系统中的模式组合</div>
+      <div class="ri-desc">现代生产系统常规组合2-3种模式——例如 Plan-and-Execute + Reflexion + ReAct做验证——单一模式已不足以应对复杂场景。</div>
+      <div class="ri-tags"><span class="tag green">Best Practice</span></div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>📖 推荐资源</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.sitepoint.com/the-definitive-guide-to-agentic-design-patterns-in-2026/" target="_blank">Agentic Design Patterns: The 2026 Guide</a></div>
+      <div class="ri-desc">SitePoint出品的权威指南，覆盖所有主流Agent设计模式。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://futureagi.com/glossary/react-pattern/" target="_blank">ReAct Pattern 深度指南</a></div>
+      <div class="ri-desc">FutureAGI出品的ReAct模式完全解析，含代码示例。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://blog.n8n.io/react-agent/" target="_blank">How to Build a ReAct Agent</a></div>
+      <div class="ri-desc">n8n出品的实战教程：架构与权衡分析。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://machinelearningmastery.com/prompt-engineering-for-agentic-ai/" target="_blank">Prompt Engineering for Agentic AI</a></div>
+      <div class="ri-desc">从提示工程到Agent系统设计的完整转型指南。</div>
+    </div>
+  </div>
+</div>
+`,
+
+'architecture': `
+<div class="content-section">
+  <h3>🏛️ LangChain 四大基础多Agent模式</h3>
+  <table class="comparison-table">
+    <tr><th>模式</th><th>架构</th><th>最适合</th></tr>
+    <tr><td><strong>Subagents</strong></td><td>Supervisor协调专业化、无状态子Agent作为工具</td><td>集中式工作流控制、跨领域并行执行</td></tr>
+    <tr><td><strong>Skills</strong></td><td>单个Agent按需加载专业prompt/资源（渐进式披露）</td><td>更轻量的prompt驱动专业化</td></tr>
+    <tr><td><strong>Handoffs</strong></td><td>基于对话上下文动态切换活跃Agent的状态驱动转换</td><td>顺序多阶段工作流</td></tr>
+    <tr><td><strong>Router</strong></td><td>路由层分类输入→并行分派到专业Agent→综合结果</td><td>多垂直领域、多源查询</td></tr>
+  </table>
+</div>
+<div class="content-section">
+  <h3>📐 架构分类法</h3>
+  <table class="comparison-table">
+    <tr><th>架构</th><th>最适合</th><th>关键权衡</th></tr>
+    <tr><td><strong>Reactive</strong></td><td>分类、路由、提取</td><td>无法处理多步推理</td></tr>
+    <tr><td><strong>Deliberative (ReAct/CoT)</strong></td><td>分析、摘要、代码生成</td><td>Token随任务深度二次增长</td></tr>
+    <tr><td><strong>Hierarchical</strong></td><td>多领域工作流</td><td>规划器错误传播到子任务</td></tr>
+    <tr><td><strong>Multi-Agent (MAS)</strong></td><td>并行分析、模拟</td><td>高协调开销</td></tr>
+    <tr><td><strong>Router-First</strong></td><td>成本效率优先</td><td>路由器本身增加延迟</td></tr>
+  </table>
+</div>
+<div class="content-section">
+  <h3>📖 必读资源</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2606.24937" target="_blank">The Hitchhiker's Guide to Agentic AI</a> <span class="tag green">2026最新</span></div>
+      <div class="ri-desc">全栈参考：Transformers→RLHF→RAG→Memory Systems→MCP→A2A→多Agent拓扑（集中式/去中心化/层次化）。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2605.08258" target="_blank">CEAD: Capability-Aligned Enterprise Agent Design</a> <span class="tag blue">企业级</span></div>
+      <div class="ri-desc">参考架构取得<strong>70.6%安全成功率</strong> vs 单体Agent 45.2% vs 无治理微Agent群23.1%（10,000企业任务测试）。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2601.03624" target="_blank">Architecting Agentic Communities using Design Patterns</a></div>
+      <div class="ri-desc">三层分类（LLM Agent→Agentic AI→Agentic Communities），基于分布式系统形式化方法。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2602.03695" target="_blank">Agent Primitives: Reusable Latent Building Blocks</a></div>
+      <div class="ri-desc">通过KV-cache通信的可复用原语（Review/Voting/Planning），比文本MAS减少<strong>3-4倍Token和延迟</strong>。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.langchain.com/blog/choosing-the-right-multi-agent-architecture" target="_blank">Choosing the Right Multi-Agent Architecture</a></div>
+      <div class="ri-desc">LangChain官方博客：如何选择多Agent架构的完整决策框架。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://mlflow.org/articles/building-production-ready-ai-agents-in-2026/" target="_blank">Building Production-Ready AI Agents in 2026</a></div>
+      <div class="ri-desc">MLflow出品，覆盖生产Agent的6大最佳实践。</div>
+    </div>
+  </div>
+</div>
+`,
+
+'security': `
+<div class="content-section">
+  <h3>🛡️ 五层防护体系（纵深防御）</h3>
+  <table class="comparison-table">
+    <tr><th>层级</th><th>功能</th><th>防范什么</th></tr>
+    <tr><td><strong>1. Input Guards（输入防护）</strong></td><td>检查用户输入和检索上下文</td><td>Prompt注入、越狱攻击、PII泄露</td></tr>
+    <tr><td><strong>2. Tool/Action Gating（工具门控）</strong></td><td>最小权限工具/API允许列表</td><td>未授权工具调用、过度权限</td></tr>
+    <tr><td><strong>3. Output Guards（输出防护）</strong></td><td>验证Agent响应</td><td>幻觉、Schema违规、不安全内容</td></tr>
+    <tr><td><strong>4. Human-in-the-Loop（人机协作）</strong></td><td>高风险操作人工审批</td><td>不可逆操作（金融/删除/外部通信）</td></tr>
+    <tr><td><strong>5. Evals Feedback Loop（评估反馈）</strong></td><td>离线测量调优层1-4</td><td>质量退化、防护校准漂移</td></tr>
+  </table>
+</div>
+<div class="content-section">
+  <h3>📜 2026 监管格局</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title">🇪🇺 EU AI Act <span class="tag red">2026.8.2强制执行</span></div>
+      <div class="ri-desc">Article 10: 数据治理文档 | Article 12: 日志记录 | Article 14: 人类监督 | Article 50: 透明度。最高罚款€3500万或全球营收7%。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">🌐 Five Eyes 联合指南 <span class="tag red">2026.5.1发布</span></div>
+      <div class="ri-desc">CISA/NSA/ASD/CCCS/NCSC/NZ NCSC联合发布：100+建议覆盖设计-开发-部署-运营全生命周期。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">🇺🇸 NIST AI RMF <span class="tag blue">持续更新</span></div>
+      <div class="ri-desc">Govern-Map-Measure-Manage框架，GenAI Profile含200+建议行动。</div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>🔑 七大防护类别（CISA/NSA共识）</h3>
+  <div class="highlight-box">
+    <p>① <strong>身份与访问控制</strong> — 每个Agent需唯一加密身份，最小权限，即时访问（JIT）</p>
+    <p>② <strong>工具与操作边界</strong> — 显式per-agent工具允许列表，版本锁定，参数校验</p>
+    <p>③ <strong>数据隐私与上下文治理</strong> — 数据分类标记，版本化上下文包，外部内容视为敌对</p>
+    <p>④ <strong>可审计性与溯源</strong> — 端到端溯源：输出→工具调用→上下文→源数据集</p>
+    <p>⑤ <strong>人类监督与审批门</strong> — 金融交易、生产变更、受监管数据访问需强制人工审批</p>
+    <p>⑥ <strong>可观测性与运行时执行</strong> — 持续遥测、断路器、紧急终止开关</p>
+    <p>⑦ <strong>事件响应与红队测试</strong> — 季度红队演练、回滚程序、事后审查</p>
+  </div>
+</div>
+<div class="content-section">
+  <h3>📖 必读资源</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.cisecurity.org/insights/white-papers/controls-v8-1-ai-agents-companion-guide" target="_blank">CIS Controls v8.1 AI Agents Companion Guide</a> <span class="tag green">2026.4</span></div>
+      <div class="ri-desc">CIS Critical Security Controls 映射到Agent特定风险。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://atlan.com/know/ai-agent/enterprise-ai-agent-guardrails-checklist/" target="_blank">Enterprise AI Agent Guardrails Checklist</a></div>
+      <div class="ri-desc">企业Agent防护完整清单，按类别组织，可操作性强。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.technologyreview.com/2026/02/04/1131014/from-guardrails-to-governance-a-ceos-guide-for-securing-agentic-systems/" target="_blank">From Guardrails to Governance (MIT Tech Review)</a></div>
+      <div class="ri-desc">MIT科技评论：CEO视角的Agent安全治理指南。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://labs.cloudsecurityalliance.org/research/csa-research-note-cisa-agentic-ai-adoption-guidance-20260522/" target="_blank">CSA: CISA Agentic AI Guidance Translation</a></div>
+      <div class="ri-desc">Cloud Security Alliance对CISA指南的企业控制翻译。</div>
+    </div>
+  </div>
+</div>
+`,
+
+'evaluation': `
+<div class="content-section">
+  <h3>📊 生产评估三层体系</h3>
+  <table class="comparison-table">
+    <tr><th>层级</th><th>做什么</th><th>工具示例</th></tr>
+    <tr><td><strong>Layer 1: Observability（可观测性）</strong></td><td>结构化记录每个推理步骤、工具调用、状态变更</td><td>traceAI, Opik, Agent Health (OTel)</td></tr>
+    <tr><td><strong>Layer 2: Benchmarking（基准测试）</strong></td><td>合成+对抗+黄金数据集回归测试</td><td>EvalMonkey, fi.simulate, fi.evals, DeepEval</td></tr>
+    <tr><td><strong>Layer 3: Continuous Improvement（持续优化）</strong></td><td>从评估结果自动化Prompt/Config优化</td><td>fi.opt, Opik Agent Optimizer</td></tr>
+  </table>
+</div>
+<div class="content-section">
+  <h3>🛠️ 核心评估工具</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/Corbell-AI/evalmonkey" target="_blank">EvalMonkey</a> <span class="tag green">推荐</span></div>
+      <div class="ri-desc">开源CLI：11框架支持，22基准测试，28种混沌注入。混沌下Agent分数平均下降~23分。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/comet-ml/opik" target="_blank">Opik (Comet)</a> <span class="tag blue">生产级</span></div>
+      <div class="ri-desc">开源可观测+评估平台，4000万+ traces/天生产规模，50+集成。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/reaatech/agent-eval-harness" target="_blank">agent-eval-harness</a> <span class="tag">TypeScript</span></div>
+      <div class="ri-desc">生产级TS monorepo，12个可组合包：轨迹评估、工具使用验证（13+问题类型）、成本跟踪。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/opensearch-project/agent-health" target="_blank">OpenSearch Agent Health</a> <span class="tag green">开源</span></div>
+      <div class="ri-desc">Golden Path轨迹对比+LLM Judge，含Claude Code/Kiro等编码Agent分析仪表板。</div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>🔬 关键发现：RAMP论文（2026.5）</h3>
+  <div class="highlight-box">
+    <p><strong>"Benchmarks are Not Enough: RAMP for Runtime Assessing of Agentic Models in Production Systems"</strong></p>
+    <p>• 任务完成率在串行工作流中<strong>逐级坍塌</strong>——从阶段1的100%降至最终阶段的仅<strong>20%</strong></p>
+    <p>• 没有模型成功完成整个多阶段管线</p>
+    <p>• 计算成本在可比模型间相差<strong>最高3个数量级</strong></p>
+    <p>• 基准测试性能<strong>不能预测</strong>长周期、工具交互、依赖管理生产环境中的真实能力</p>
+  </div>
+</div>
+`,
+
+'memory': `
+<div class="content-section">
+  <h3>💾 2026年Agent记忆系统前沿</h3>
+  <table class="comparison-table">
+    <tr><th>系统</th><th>核心创新</th><th>性能亮点</th></tr>
+    <tr><td><strong>Mandol</strong> (2026.6)</td><td>凝聚式记忆：向量图统一架构+层次记忆模型</td><td>最佳LoCoMo & LongMemEval；5.4×检索加速</td></tr>
+    <tr><td><strong>SAGE</strong> (2026.5)</td><td>自进化Agent图记忆引擎，Graph Foundation Model读写反馈</td><td>NQ Recall@2/5: 82.5/91.6</td></tr>
+    <tr><td><strong>Microsoft Memora</strong> (2026.6)</td><td>解耦记忆内容与检索句柄+策略引导迭代检索</td><td>86.3% LoCoMo；最多98%上下文Token减少</td></tr>
+    <tr><td><strong>CraniMem</strong> (2026.3)</td><td>神经认知启发的门控记忆：情景缓冲+长期KG+巩固/修剪</td><td>ICLR 2026 Workshop；优于RAG&Mem0</td></tr>
+    <tr><td><strong>Graphiti (Zep)</strong></td><td>开源双时态知识图谱，增量更新+MCP集成</td><td>18.5%准确率提升；90%延迟减少</td></tr>
+  </table>
+</div>
+<div class="content-section">
+  <h3>🧩 新兴设计模式</h3>
+  <div class="highlight-box">
+    <p>① <strong>解耦存储与检索</strong> — 分离"存什么"与"如何找到"（Memora, Mandol）</p>
+    <p>② <strong>层次化记忆</strong> — 情景/短期缓冲 → 语义/长期图谱固化（CraniMem, SAGE）</p>
+    <p>③ <strong>闭环自进化</strong> — Reader反馈告知Writer图谱缺失内容（SAGE）</p>
+    <p>④ <strong>时间感知</strong> — 双时态有效窗口、固化管线、过期边检测（Graphiti）</p>
+    <p>⑤ <strong>门控固化</strong> — 效用标记记忆通过调度重放+修剪控制图谱增长（CraniMem）</p>
+    <p>⑥ <strong>多模态检索</strong> — 混合语义搜索+BM25+图遍历+时间过滤</p>
+  </div>
+</div>
+<div class="content-section">
+  <h3>📖 核心论文</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2606.29778" target="_blank">Mandol: Agglomerative Agent Memory for Long-Term Conversations</a></div>
+      <div class="ri-desc">统一向量+图的分层架构，当前SOTA长期对话记忆。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2605.12061" target="_blank">SAGE: Self-Evolving Agentic Graph-Memory Engine</a></div>
+      <div class="ri-desc">Graph Foundation Model + Reader/Writer反馈循环的自进化记忆。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.computerworld.com/article/4191034/microsoft-unveils-memora-to-tackle-ai-agents-memory-problem-2.html" target="_blank">Microsoft Memora</a></div>
+      <div class="ri-desc">解耦记忆架构，最多98%上下文Token减少。</div>
+    </div>
+  </div>
+</div>
+`,
+
+'papers': `
+<div class="content-section">
+  <h3>📚 2024–2026 必读论文精选</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2606.24937" target="_blank">The Hitchhiker's Guide to Agentic AI: From Foundations to Systems</a> <span class="tag green">2026.6</span></div>
+      <div class="ri-desc"><strong>全栈Agent圣经级综述。</strong>Transformers→RLHF→RAG→Memory→MCP→A2A→多Agent拓扑全覆盖。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2605.08258" target="_blank">CEAD: Capability-Aligned Multi-Agent Architecture</a> <span class="tag blue">2026.5</span></div>
+      <div class="ri-desc">能力对齐企业Agent设计。70.6%安全成功率，10,000任务验证。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2605.27492" target="_blank">RAMP: Runtime Assessing of Agentic Models in Production</a> <span class="tag red">2026.5</span></div>
+      <div class="ri-desc">基准测试不足以评估生产Agent——串行工作流完成率从100%崩塌至20%。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2602.03695" target="_blank">Agent Primitives: Reusable Latent Building Blocks for MAS</a> <span class="tag">2026.2</span></div>
+      <div class="ri-desc">KV-cache通信的Agent原语（Review/Voting/Planning），比文本MAS减少3-4倍成本。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2601.03624" target="_blank">Architecting Agentic Communities using Design Patterns</a> <span class="tag">2026.1</span></div>
+      <div class="ri-desc">三层分类（LLM Agent→Agentic AI→Agentic Communities），分布式系统形式化方法。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2604.18071" target="_blank">Architectural Design Decisions in AI Agent Harnesses</a> <span class="tag">2026.4</span></div>
+      <div class="ri-desc">Agent Harness架构设计决策的系统分析。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://www.sciencedirect.com/science/article/abs/pii/S0925231226014475" target="_blank">Agentic AI Systems: A Systematic Survey</a> <span class="tag amber">2026</span></div>
+      <div class="ri-desc">200+论文系统综述：架构、认知基础、交互、可解释性、安全、评估六维度。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2603.15642" target="_blank">CraniMem: Gated and Bounded Memory for Agentic Systems</a> <span class="tag">2026 ICLR</span></div>
+      <div class="ri-desc">神经认知启发的门控记忆系统，ICLR 2026 MemAgents Workshop。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2606.29778" target="_blank">Mandol: Agglomerative Agent Memory for Long-Term Conversations</a> <span class="tag green">2026.6</span></div>
+      <div class="ri-desc">当前SOTA长期Agent对话记忆系统。</div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>🏛️ 基础性经典论文</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2210.03629" target="_blank">ReAct: Synergizing Reasoning and Acting in Language Models</a> <span class="tag amber">ICLR 2023</span></div>
+      <div class="ri-desc">Yao et al. 奠定现代Agent循环范式的经典。Thought→Action→Observation循环。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2303.17760" target="_blank">CAMEL: Communicative Agents for "Mind" Exploration</a> <span class="tag amber">NeurIPS 2023</span></div>
+      <div class="ri-desc">角色扮演式多Agent通信框架，提出"角色分配→协作"的多Agent范式。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2304.03442" target="_blank">Generative Agents: Interactive Simulacra of Human Behavior</a> <span class="tag amber">UIST 2023</span></div>
+      <div class="ri-desc">Stanford "Smallville"实验——25个Agent在模拟小镇中的涌现行为，含记忆流架构。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://arxiv.org/abs/2308.00352" target="_blank">AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation</a> <span class="tag">Microsoft</span></div>
+      <div class="ri-desc">微软多Agent对话框架的奠基论文。</div>
+    </div>
+  </div>
+</div>
+`,
+
+'projects': `
+<div class="content-section">
+  <h3>🔧 Hands-on 实战项目</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title">🤖 项目1: 从零构建 ReAct Agent <span class="tag green">入门</span></div>
+      <div class="ri-desc">用Python/TypeScript手写一个完整的ReAct循环Agent，不依赖任何框架。理解Thought→Action→Observation核心循环。<br/>
+      <strong>技术栈：</strong>Python + OpenAI API / Anthropic API<br/>
+      <strong>学习目标：</strong>理解Agent核心循环、工具调用、状态管理</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">📊 项目2: RAG Agent with Memory <span class="tag blue">进阶</span></div>
+      <div class="ri-desc">构建带长期记忆的知识库问答Agent：向量数据库+Pinecone/Chroma + 对话历史管理 + 知识图谱集成。<br/>
+      <strong>技术栈：</strong>LangChain/LlamaIndex + ChromaDB/Weaviate<br/>
+      <strong>学习目标：</strong>RAG管线、记忆管理、检索优化</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">🔌 项目3: 构建 MCP Server <span class="tag green">必做</span></div>
+      <div class="ri-desc">从零构建一个MCP Server并部署到生产：工具定义→资源暴露→OAuth认证→Streamable HTTP传输→Claude Desktop集成。<br/>
+      <strong>技术栈：</strong>Python (fastmcp) / TypeScript (@modelcontextprotocol/sdk)<br/>
+      <strong>学习目标：</strong>MCP协议实战、工具设计最佳实践、生产部署</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">👥 项目4: Multi-Agent 协作系统 <span class="tag amber">高级</span></div>
+      <div class="ri-desc">构建角色化多Agent系统：Planner→Researcher→Writer→Reviewer协作完成研究报告。<br/>
+      <strong>技术栈：</strong>CrewAI / LangGraph + 多个专业Agent<br/>
+      <strong>学习目标：</strong>多Agent协调、任务分解、结果综合</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">💻 项目5: Coding Agent（SWE-Bench风格） <span class="tag red">挑战</span></div>
+      <div class="ri-desc">构建能自动修复GitHub Issue的编码Agent：代码理解→定位Bug→生成修复→运行测试→提交PR。<br/>
+      <strong>技术栈：</strong>Claude Agent SDK / OpenAI Agents + GitHub MCP<br/>
+      <strong>学习目标：</strong>代码推理、工具编排、CI/CD集成</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">🛒 项目6: E-Commerce Customer Service Agent <span class="tag">实用</span></div>
+      <div class="ri-desc">构建电商客服Agent：订单查询→退换货→产品推荐→人工转接，含完整对话管理和情感分析。<br/>
+      <strong>技术栈：</strong>LangGraph + PostgreSQL + Redis<br/>
+      <strong>学习目标：</strong>对话状态机、工具集成、生产错误处理</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">📈 项目7: Agent 评估与监控平台 <span class="tag blue">工程</span></div>
+      <div class="ri-desc">构建Agent评估Dashboard：轨迹收集→LLM-as-Judge评分→成本追踪→延迟监控→Chaos测试→CI集成。<br/>
+      <strong>技术栈：</strong>Opik / OpenTelemetry + Grafana<br/>
+      <strong>学习目标：</strong>Agent可观测性、评估方法论、持续改进</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title">🔒 项目8: Agent 安全防护系统 <span class="tag red">安全</span></div>
+      <div class="ri-desc">实现5层Agent Guardrails：输入过滤→工具门控→输出校验→人工审批→评估反馈。含Prompt注入检测和权限控制。<br/>
+      <strong>技术栈：</strong>NVIDIA NeMo Guardrails / Guardrails AI<br/>
+      <strong>学习目标：</strong>Agent安全架构、权限模型、合规审计</div>
+    </div>
+  </div>
+</div>
+<div class="content-section">
+  <h3>📂 项目参考仓库</h3>
+  <div class="resource-list">
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/buildfastwithai/gen-ai-experiments" target="_blank">gen-ai-experiments</a></div>
+      <div class="ri-desc">Jupyter Notebook集合，覆盖多种AI工具和技术的综合指南。</div>
+    </div>
+    <div class="resource-item">
+      <div class="ri-title"><a href="https://github.com/EthicalML/awesome-agentic-engineering-resources" target="_blank">awesome-agentic-engineering-resources</a></div>
+      <div class="ri-desc">矩阵式资源列表，21个主题，含课程、论文、书籍、教程、基准和Playbook。</div>
+    </div>
+  </div>
+</div>
+`
+
+};
+
+function openModal(key) {
+  const data = DATA[key];
+  if (!data) return;
+  const titles = {
+    'getting-started': {icon:'🎯', title:'入门必学 — 从零到Agent开发者'},
+    'frameworks': {icon:'🏗️', title:'框架与工具 — 深度对比与选型'},
+    'mcp': {icon:'🔌', title:'MCP协议 — 完整学习指南'},
+    'prompting': {icon:'🧠', title:'提示词与推理 — Agent核心模式'},
+    'architecture': {icon:'🏛️', title:'架构设计 — 生产级模式'},
+    'security': {icon:'🛡️', title:'安全与治理 — 纵深防御'},
+    'evaluation': {icon:'📊', title:'评估与监控 — 三层体系'},
+    'memory': {icon:'💾', title:'记忆与知识 — 前沿系统'},
+    'papers': {icon:'📚', title:'必读论文 — 2024–2026精选'},
+    'projects': {icon:'🔧', title:'实战项目 — Hands-on Building'},
+  };
+  const t = titles[key] || {icon:'📌', title:key};
+  document.getElementById('modalIcon').textContent = t.icon;
+  document.getElementById('modalTitle').textContent = t.title;
+  document.getElementById('modalBody').innerHTML = data;
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModalDirect();
+});
+</script>
+</body>
+</html>
